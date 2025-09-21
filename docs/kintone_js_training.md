@@ -144,13 +144,11 @@ let element = document.querySelector('.item');    // クラス
 </html>
 ```
 
-> **ひと言メモ**
+> ひと言メモ : 「letの方が便利だから、letを使っておけばいいのでは？？」
 >
-> 「letの方が便利だから、letを使っておけばいいのでは？？」
+> たしかに便利ですが、プログラムをメンテナンスする人にとっては、「後で値が変わってるかもしれない・・・」と、調査する範囲が広くなります。
 >
-> → たしかに便利ですが、プログラムをメンテナンスする人にとっては、「後で値が変わってるかもしれない・・・」と、調査する範囲が広くなります。
->
-> → プログラミングでは、必要十分な機能に絞ることがとても大切です。必要ない限りはletを使わず、constで定義するのがプログラマの嗜みです。
+> プログラミングでは、必要十分な機能に絞ることがとても大切です。必要ない限りはletを使わず、constで定義するのがプログラマの嗜みです。
 
 ### 関数の書き方
 
@@ -282,27 +280,27 @@ let element = document.querySelector('.item');    // クラス
 </html>
 ```
 
-**TIPS**
-オブジェクトをconstに代入した場合はどうなる・・・？
-
-```js
-// オブジェクトの作成
-const user = {
-    name: '田中 洋子',
-    age: 30,
-    email: 'tanaka@example.com'
-};
-
-// 属性の変更はOK
-user.name = '佐藤 洋子';
-
-// 別オブジェクトの代入はNG
-user = {
-    name: '吉田 一郎',
-    age: 58,
-    email: 'yoshida@example.com'
-};
-```
+> ひとことメモ : オブジェクトをconstに代入した場合はどうなる・・・？
+> 
+> ```js
+> // オブジェクトの作成
+> const user2 = {
+>     name: '田中 洋子',
+>     age: 30,
+>     email: 'tanaka@example.com'
+> };
+> 
+> // 属性の変更はOK
+> user2.name = '佐藤 洋子';
+> 
+> // 別オブジェクトの代入はNG
+> user2 = {
+>     name: '吉田 一郎',
+>     age: 58,
+>     email: 'yoshida@example.com'
+> };
+> ```
+> 
 
 ### 配列の基本
 
@@ -569,33 +567,6 @@ element.addEventListener('click', function() {
 - ブラウザが「イベントが起きたとき」に自動的に関数を呼び出す
 - 私たちは「このイベントが起きたら、この関数を実行してください」とお願いしているだけ
 
-### KintoneとHTMLの関係
-
-この仕組みは、Kintoneでも全く同じです：
-
-**HTML/JavaScript：**
-
-```javascript
-element.addEventListener('click', function() {
-    // クリック時の処理
-});
-```
-
-**Kintone：**
-
-```javascript
-kintone.events.on('app.record.edit.change.数量', function(event) {
-    // フィールド変更時の処理
-});
-```
-
-- HTMLでは`addEventListener`
-- Kintoneでは`kintone.events.on`
-- どちらも「イベントが起きたら関数を実行」という同じ仕組み
-- どちらも第2引数に関数を渡している
-
-つまり、今理解していただいたイベントリスナーの概念が、そのままKintoneカスタマイズに応用されるのです。
-
 ---
 
 ## 3. Kintoneの仕組みとイベント（22分）
@@ -639,7 +610,7 @@ kintone.events.on('イベント名', function(event) {
 
 先ほど学んだイベントリスナーと全く同じ仕組みですね！
 
-**HTMLとKintoneの比較：**
+**素のHTMLとKintoneの比較：**
 
 ```javascript
 // HTML
@@ -653,6 +624,14 @@ kintone.events.on('app.record.edit.change.数量', function(event) {
     return event;
 });
 ```
+
+> ひとことメモ : kintoneのAPIドキュメント
+>
+> どんなイベントが使えて、イベント内にどんな情報を持っているかなどの情報が開発者向けのドキュメントとして公開されています。
+>
+> - [イベントハンドラーを登録する](https://cybozu.dev/ja/id/37f50c8d618067d42eee8050/#register-event-handlers)
+>
+> - [イベント](https://cybozu.dev/ja/id/9744d83c79ac1b73e5cab2c7/#event)
 
 **重要なポイント：**
 
@@ -745,13 +724,53 @@ kintone.events.on('app.record.edit.change.数量', function(event) {
     
 })();
 ```
+> 一言メモ : `use strict`とは
+>
+> JavaScriptのコードをより厳密なモードで実行するための指示文です。
+> 暗黙的なグローバル変数の禁止や、関数での重複するパラメータ名の禁止など
+>
+> 基本的に指定することが推奨されます。
+
+> 一言メモ : 即時実行関数（IIFE）とは
+>
+>上記のコードでは`(function() { ... })()`という書き方を使用しています。これは**即時実行関数（IIFE: Immediately Invoked Function Expression）**と呼ばれる重要なパターンです。
+>
+>**なぜこの書き方を使うのか：**
+>
+>1. **変数等の定義の衝突を防ぐ**
+>   - Kintoneでは複数のカスタマイズが同時に動作することがあります
+>   - 同じ変数名や関数名があると、予期しない動作の原因になります
+>   ```javascript
+>   // ❌ グローバル変数を作ってしまう例
+>   let userName = '田中';
+>   function calculateTotal() { ... }
+>
+>   // ✅ 即時実行関数で囲む
+>   (function() {
+>       let userName = '田中';      // この変数は外部から見えない
+>       function calculateTotal() { ... }  // この関数も外部から見えない
+>   })();
+>   ```
+>
+>**基本構造：**
+>```javascript
+>(function() {
+>    'use strict';  // 厳密モード（安全なコード実行のため）
+>
+>    // ここに書いたコードは外部から見えない
+>    // Kintoneイベントの登録処理を書く
+>
+>})();  // 関数を定義と同時に実行
+>```
+>
+>これはKintoneカスタマイズの標準的な書き方として覚えておきましょう。
 
 ### Step 2: バリデーション追加
 
 ```javascript
 (function() {
     'use strict';
-    
+
     kintone.events.on('app.record.edit.change.数量', function(event) {
         let record = event.record;
         
@@ -761,8 +780,6 @@ kintone.events.on('app.record.edit.change.数量', function(event) {
         // バリデーション: 負の数チェック
         if (quantity < 0) {
             alert('数量に負の数は入力できません');
-            record['数量'].value = 0;
-            quantity = 0;
         }
         
         let total = price * quantity;
@@ -795,8 +812,6 @@ kintone.events.on('app.record.edit.change.数量', function(event) {
         // バリデーション: 負の数チェック
         if (quantity < 0) {
             alert('数量に負の数は入力できません');
-            record['数量'].value = 1;  // 1に修正（0だと保存時エラーになるため）
-            quantity = 1;
         }
         
         let total = price * quantity;
@@ -816,9 +831,9 @@ kintone.events.on('app.record.edit.change.数量', function(event) {
         
         let quantity = parseInt(record['数量'].value) || 0;
         
-        // 必須チェック: 数量は1以上でないと保存できない
-        if (quantity < 1) {
-            event.error = '数量は1以上で入力してください';
+        // バリデーション: 負の数チェック
+        if (quantity < 0) {
+            event.error = '数量に負の数は入力できません';
             return event;
         }
         
@@ -830,19 +845,12 @@ kintone.events.on('app.record.edit.change.数量', function(event) {
 
 ### 重要なポイント
 
-**1. ロジックの統一**
-
-- **入力時のチェック**: `quantity < 0` → 負の数は1に修正
-- **保存時のチェック**: `quantity < 1` → 1未満は保存エラー
-
-なぜ1に修正するかというと、0に修正すると保存時にエラーになってしまうからです。
-
-**2. エラーハンドリングの使い分け**
+**1. エラーハンドリングの使い分け**
 
 - `alert()`: 警告だけ（処理は続行）
 - `event.error`: 保存を停止
 
-**3. 配列でのイベント指定**
+**2. 配列でのイベント指定**
 
 ```javascript
 ['app.record.create.submit', 'app.record.edit.submit']
@@ -857,16 +865,30 @@ kintone.events.on('app.record.edit.change.数量', function(event) {
 3. 作成したコードを .js ファイルとして保存してアップロード
 4. 「アプリを更新」をクリック
 
+> 一言メモ : javascriptでのエラーチェックは厳格ではない
+>
+> JavaScriptのコードはブラウザで実行されるものであり、
+> 基本的に、処理内容がそのままユーザ側に見えています。
+>
+> 開発者ツールからソースタブを開くと、以下にjavascriptファイルが見つかります
+>   top > kintoneのドメイン名 > k > api/js > download.do?app=xxxxx
+> これを開いて、右クリック＞コンテンツをオーバーライド　すると、
+> 保存時のチェック処理を削除してしまうこともできます
+>
+> 本格的には、保存処理を受け付けたサーバ側でチェックすることが必要ですが、
+> kintoneにはそうした仕組みが備わっていません。
+> 利害の異なる第三者に利用させる想定の場合は、こうした点にも注意しましょう。
+
 ---
 
 ## 5. デバッグ・トラブル対応（10分）
 
 ### ブラウザ開発者ツールの使い方
 
-**開き方**
+**html要素の見つけ方**
 
-- Chrome/Edge: F12 または 右クリック→「検証」
-- Firefox: F12 または 右クリック→「要素を調査」
+- Chrome/Edge: 右クリック→「検証」
+- Firefox: 右クリック→「要素を調査」
 
 **Console タブの活用**
 
