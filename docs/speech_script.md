@@ -47,11 +47,26 @@
 
 今見ていただいたように、HTMLは「見た目」を作り、JavaScriptは「動作」を制御します。そして、Consoleは「何が起きているか」を確認するためのツールです。
 
+**要素の取得方法も覚えておきましょう：**
+
+```javascript
+// ID で取得
+let element = document.getElementById('name');
+
+// クラス名で取得
+let elements = document.getElementsByClassName('item');
+
+// より便利な方法
+let element = document.querySelector('#name');    // ID
+let element = document.querySelector('.item');    // クラス
+```
+
 この関係性は、Kintoneでも全く同じです。
 
 - HTMLの代わりに → Kintoneのフィールド
 - JavaScriptは → カスタマイズ処理
 - Consoleは → デバッグとテスト確認
+- 要素取得 → フィールド値の取得・設定
 
 ### まとめ（2分）
 
@@ -779,7 +794,71 @@ kintone.events.on(['app.record.create.submit', 'app.record.edit.submit'], functi
 
 ---
 
-## 6. 次のステップ・自習の進め方（15分）
+## 6. 応用範囲の広がり - FormBridgeとkViewer（10分）
+
+### 学習内容の応用先（3分）
+
+実は、今日学んだ知識は、Kintone以外でも活用できます。サイボウズの関連製品でも、同じイベントリスナーとコールバック関数の仕組みが使われています。
+
+### FormBridge（フォームブリッジ）の紹介（3分）
+
+**FormBridge**は、KintoneのフォームをWebサイトに埋め込むサービスです。これも今日学んだ技術がそのまま使えます。
+
+```javascript
+// FormBridgeのカスタマイズ例
+formBridge.events.on('form.field.change.single_line_text', function (context) {
+  // 変更前の値
+  const value = context.value;
+  // ...value を用いた処理...
+});
+
+formBridge.events.on('form.submitted', function (context) {
+  // 完了画面を表示せずに https://example.com へリダイレクト
+  context.preventDefault();
+  window.location.href = 'https://example.com';
+});
+```
+
+### kViewerの紹介（2分）
+
+**kViewer**は、Kintoneのデータを使ってダッシュボードやレポートを作成するサービスです。同様にイベント起点でのカスタマイズ処理を記述可能です。
+
+```javascript
+// kViewerのカスタマイズ例
+kviewer.events.on('records.show', function (context) {
+	const $records = context.getRecordElements();
+	// 任意の処理
+});
+```
+
+### 共通する概念（2分）
+
+**今日学んだ知識がそのまま応用できます：**
+
+1. **イベントリスナーの仕組み**
+   - Kintone: `kintone.events.on()`
+   - FormBridge: `formBridge.events.on()`
+   - kViewer: `kviewer.events.on()`
+
+2. **コールバック関数の概念**
+   - 第1引数：イベント名
+   - 第2引数：実行する関数
+
+3. **デバッグ方法**
+   - F12 → Console確認
+   - `console.log()`での動作確認
+   - エラーメッセージの読み方
+
+4. **基本的なJavaScript**
+   - 変数、関数、オブジェクト、配列
+   - 条件分岐とループ処理
+   - イベント駆動プログラミング
+
+今日の研修で学んだ技術は、単なるKintoneカスタマイズにとどまりません。FormBridge（Webサイトへのフォーム埋め込み）、kViewer（データダッシュボードの作成）、その他のWebアプリケーションでも、イベントリスナーは標準的な技術として活用できます。
+
+---
+
+## 7. 次のステップ・自習の進め方（15分）
 
 ### 今日の達成事項（3分）
 
@@ -819,6 +898,36 @@ kintone.events.on(['app.record.create.submit', 'app.record.edit.submit'], functi
 - 他のイベントや高度な機能にチャレンジ
 - 新しいバグに出会ったら、今日覚えたデバッグ手法で解決
 
+**さらに学びたい方への詳細ロードマップ：**
+
+#### レベル1: JavaScript非同期処理
+
+- [ ] Promise と async/await の基礎
+- [ ] 非同期処理とコールバック地獄の回避
+- [ ] REST API 呼び出しの準備知識
+- [ ] エラーハンドリング（try-catch）
+
+#### レベル2: 基本カスタマイズ
+
+- [ ] 他のイベントの活用（show系、submit系）
+- [ ] 日付・時刻フィールドの操作
+- [ ] ユーザー情報の取得
+- [ ] 条件による表示/非表示
+
+#### レベル3: 応用カスタマイズ
+
+- [ ] 他アプリからのデータ取得（REST API）
+- [ ] ルックアップの自動実行
+- [ ] ファイルアップロード処理
+- [ ] 外部サービスとの連携
+
+#### レベル4: 高度なカスタマイズ
+
+- [ ] プロセス管理の自動化
+- [ ] 複雑な計算処理
+- [ ] CSVインポート・エクスポート
+- [ ] グラフの生成
+
 ### 学習リソース（2分)
 
 継続学習のための資料をご紹介します：
@@ -848,7 +957,18 @@ kintone.events.on(['app.record.create.submit', 'app.record.edit.submit'], functi
 
 エラーを恐れる必要はありません。エラーは「学習のチャンス」です。今日覚えたF12 → Console確認の手順で、必ず解決できます。
 
-### 質疑応答（なし）
+### 質疑応答（3分）
+
+**よくある質問**
+
+**Q: どのくらい勉強すれば実用的なカスタマイズができるようになりますか？**
+A: 基本的なカスタマイズなら1-2週間、応用レベルなら1-2ヶ月程度が目安です。毎日少しずつでも継続することが重要です。
+
+**Q: エラーが出たときはどうすればいいですか？**
+A: まずはブラウザの開発者ツールでエラー内容を確認し、Google で検索してみてください。生成AIに聞いてもいいでしょう。それでも解決しない場合は、社内の詳しい人に相談しましょう。
+
+**Q: より複雑なカスタマイズをするにはどうすればいいですか？**
+A: まずは公式ドキュメントを読み、サンプルコードを参考にしながら少しずつ機能を追加していきましょう。無理に一度に多くの機能を実装しようとせず、段階的に進めることが大切です。
 
 ご質問がある方は、いつでもお声がけください。今後も皆さんのKintoneカスタマイズを応援いたします。
 

@@ -689,7 +689,32 @@ kintone.events.on('app.record.edit.change.数量', function(event) {
 
 ## 4. 実践：カスタマイズを一緒に作成（25分）
 
-### 作成するカスタマイズ
+### 実際のkintoneアプリでの実習
+
+`cheats`フォルダに含まれている `js-kintone-training.zip` は、実際のkintoneアプリのテンプレートです。以下の手順で実習環境を構築できます。
+
+#### アプリテンプレートの利用手順
+
+1. **kintoneにログイン**
+   - 所属組織のkintone環境にアクセス
+
+2. **アプリテンプレートの読み込み**
+   - 「アプリ」画面で「アプリを作成」をクリック
+   - 「ファイルから作成」を選択
+   - `js-kintone-training.zip` をアップロード
+
+3. **作成されるアプリの構成**
+   - **単価** フィールド（数値）
+   - **数量** フィールド（数値）
+   - **合計** フィールド（数値、計算結果表示用）
+
+4. **カスタマイズの実装**
+   - アプリの「設定」→「JavaScript / CSS でカスタマイズ」
+   - 以降で作成したJavaScriptコードを `.js` ファイルとして保存し、アップロード
+     - kintone環境の管理者権限が必要です
+   - 「アプリを更新」をクリック
+
+### カスタマイズを作成してみよう
 
 「入力チェック付き計算フィールド」を作成します。
 
@@ -847,8 +872,8 @@ kintone.events.on('app.record.edit.change.数量', function(event) {
 
 **1. エラーハンドリングの使い分け**
 
-- `alert()`: 警告だけ（処理は続行）
-- `event.error`: 保存を停止
+- `alert()`: 警告のポップアップ表示するだけ（処理は続行）　※一般的なjavascriptの機能
+- `event.error`: 保存を停止　※kintone特有
 
 **2. 配列でのイベント指定**
 
@@ -857,13 +882,6 @@ kintone.events.on('app.record.edit.change.数量', function(event) {
 ```
 
 新規作成と編集の両方で同じチェックを実行できます。
-
-### 完成版をKintoneに設定する手順
-
-1. Kintone アプリの「設定」→「JavaScript / CSS でカスタマイズ」
-2. 「JavaScript ファイル」の「アップロードして追加」
-3. 作成したコードを .js ファイルとして保存してアップロード
-4. 「アプリを更新」をクリック
 
 > 一言メモ : javascriptでのエラーチェックは厳格ではない
 >
@@ -879,7 +897,7 @@ kintone.events.on('app.record.edit.change.数量', function(event) {
 > kintoneにはそうした仕組みが備わっていません。
 > 利害の異なる第三者に利用させる想定の場合は、こうした点にも注意しましょう。
 
-### カスタマイズ処理でよく使うJavaScript例
+### 参考：カスタマイズ処理でよく使うJavaScript例
 
 ```javascript
 // 数値変換（エラーの場合は0）
@@ -911,21 +929,9 @@ let date = now.getDate();
 - Chrome/Edge: 右クリック→「検証」
 - Firefox: 右クリック→「要素を調査」
 
-**Console タブの活用**
+**デバッグに役立つConsoleコマンド**
 
-```javascript
-// デバッグ用の出力
-console.log('デバッグメッセージ');
-console.log('変数の値:', variable);
-
-// エラーメッセージの表示
-event.error = 'エラーメッセージ';
-```
-
-
-
-### デバッグに役立つConsoleコマンド
-
+- ログを出しておけば、コンソールにソースコードをたどるurlが表示されて便利
 ```javascript
 // 基本的な出力
 console.log('メッセージ');
@@ -1091,28 +1097,7 @@ console.table(配列);
 
 ---
 
-**研修お疲れ様でした！**
-
-### 今日の学習の振り返り
-
-- [x] HTMLとJavaScriptの関係を理解
-- [x] JavaScript基礎文法を実際に動かして確認
-- [x] イベントリスナーとコールバック関数の概念を習得
-- [x] Kintoneイベントの仕組みを体験
-- [x] 実用的なカスタマイズを作成
-- [x] デバッグ方法を習得
-
-### 次のステップ
-
-1. **今週中に**: 提供したHTMLファイルを全て実行して動作を確認
-2. **来週まで**: 簡単なKintoneカスタマイズを1つ作成してみる
-3. **今月中に**: 公式ドキュメントを読んで機能を1つ追加
-
-実際のカスタマイズに挑戦する際は、今日学んだデバッグ方法を活用し、少しずつ機能を追加していくことが成功の鍵です！
-
----
-
-## 7. 応用範囲の広がり - FormBridgeとkViewer
+## 6. 応用範囲の広がり - FormBridgeとkViewer
 
 ### 学習内容の応用先
 
@@ -1218,6 +1203,8 @@ kviewer.events.on('records.show', function (context) {
 - **kViewer**: データダッシュボードの作成
 - **その他のWebアプリケーション**: イベントリスナーは標準的な技術
 
+## 7. 次のステップ・自習の進め方（15分）
+
 ---
 
 **研修お疲れ様でした！**
@@ -1231,114 +1218,6 @@ kviewer.events.on('records.show', function (context) {
 - [x] 実用的なカスタマイズを作成
 - [x] デバッグ方法を習得
 - [x] 応用範囲（FormBridge、kViewer）を理解
-
-### 次のステップ
-
-1. **今週中に**: 提供したHTMLファイルを全て実行して動作を確認
-2. **来週まで**: 簡単なKintoneカスタマイズを1つ作成してみる
-3. **今月中に**: 公式ドキュメントを読んで機能を1つ追加
-4. **興味があれば**: FormBridgeやkViewerにもチャレンジ
-
-実際のカスタマイズに挑戦する際は、今日学んだデバッグ方法を活用し、少しずつ機能を追加していくことが成功の鍵です！
-
-```
-
-### よくあるエラーと対処法
-
-#### 1. `Cannot read property 'value' of undefined`
-**原因**: フィールドコードが間違っている
-```javascript
-// ❌ 間違い
-let value = record['存在しないフィールド'].value;
-
-// ✅ 正しい
-let value = record['正しいフィールドコード'].value;
-```
-
-#### 2. `event is not defined`
-
-**原因**: return event を忘れている
-
-```javascript
-// ❌ 間違い
-kintone.events.on('app.record.edit.show', function(event) {
-    // 処理
-    // return event; が無い
-});
-
-// ✅ 正しい
-kintone.events.on('app.record.edit.show', function(event) {
-    // 処理
-    return event;
-});
-```
-
-#### 3. `Uncaught SyntaxError`
-
-**原因**: 構文エラー（カッコの閉じ忘れ、セミコロン忘れなど）
-
-```javascript
-// ❌ 間違い
-if (condition {
-    // 処理
-}
-
-// ✅ 正しい
-if (condition) {
-    // 処理
-}
-```
-
-#### 4. 文字列結合で計算がおかしくなる
-
-**原因**: parseInt()を忘れて文字列のまま計算している
-
-```javascript
-// ❌ 間違い（"50" + "2" = "502"になる）
-let price = record['単価'].value;
-let quantity = record['数量'].value;
-let total = price + quantity;  // 文字列結合になる
-
-// ✅ 正しい
-let price = parseInt(record['単価'].value) || 0;
-let quantity = parseInt(record['数量'].value) || 0;
-let total = price * quantity;  // 数値計算になる
-```
-
-#### 5. record.フィールドコードとrecord['フィールドコード']の混同
-
-**原因**: ドット記法とブラケット記法を混同している
-
-```javascript
-// ❌ 間違い（日本語フィールドコードではエラー）
-let value = record.商品名.value;
-
-// ✅ 正しい
-let value = record['商品名'].value;
-
-// 英語フィールドコードならどちらでもOK
-let value1 = record.productName.value;
-let value2 = record['productName'].value;
-```
-
-### デバッグのコツ
-
-1. `console.log()` で変数の中身を確認
-2. 一行ずつコメントアウトして問題箇所を特定
-3. エラーメッセージを Google で検索
-
----
-
-## 6. 次のステップ・自習の進め方（15分）
-
-### 今日できるようになったこと
-
-- [x] JavaScriptの基本文法
-- [x] イベントリスナーとコールバック関数の概念
-- [x] Kintoneイベントの仕組み
-- [x] フィールド値の取得・設定
-- [x] 基本的なバリデーション
-- [x] デバッグ方法
 
 ### 次に学ぶべきこと
 
@@ -1369,42 +1248,6 @@ let value2 = record['productName'].value;
 - [ ] 複雑な計算処理
 - [ ] CSVインポート・エクスポート
 - [ ] グラフの生成
-
-### 実際のkintoneアプリでの実習
-
-このフォルダに含まれている `js-kintone-training.zip` は、実際のkintoneアプリのテンプレートです。以下の手順で実習環境を構築できます。
-
-#### アプリテンプレートの利用手順
-
-1. **kintoneにログイン**
-   - 所属組織のkintone環境にアクセス
-
-2. **アプリテンプレートの読み込み**
-   - 「アプリ」画面で「アプリを作成」をクリック
-   - 「ファイルから作成」を選択
-   - `js-kintone-training.zip` をアップロード
-
-3. **作成されるアプリの構成**
-   - **単価** フィールド（数値）
-   - **数量** フィールド（数値）
-   - **合計** フィールド（数値、計算結果表示用）
-
-4. **カスタマイズの実装**
-   - アプリの「設定」→「JavaScript / CSS でカスタマイズ」
-   - 研修で作成したJavaScriptファイルをアップロード
-   - 「アプリを更新」をクリック
-
-5. **動作確認**
-   - レコード追加画面で単価・数量を入力
-   - 合計が自動計算されることを確認
-   - ブレークポイントデバッグも実習可能
-
-#### 実習のメリット
-
-- **実際の環境**: 本物のkintoneアプリでの動作確認
-- **即戦力**: そのまま業務で活用可能
-- **デバッグ練習**: Chrome DevToolsでの実践的デバッグ
-- **カスタマイズ拡張**: 研修後に機能追加の練習が可能
 
 ### 自習用リソース
 
