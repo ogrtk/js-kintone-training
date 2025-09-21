@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>JavaScript基礎 - 配列</title>
+</head>
+
+<body>
+    <h1>JavaScript基礎 - 配列デモ</h1>
+    <p>F12でConsoleを確認してください</p>
+
+    <script>
+        console.log('=== 配列のデモ ===');
+
+        // 配列の作成
+        let fruits = ['りんご', 'みかん', 'ばなな'];
+        console.log('fruits配列:', fruits);
+
+        // 要素の取得
+        console.log('fruits[0]:', fruits[0]);     // 'りんご'
+        console.log('fruits[1]:', fruits[1]);     // 'みかん'
+        console.log('fruits[2]:', fruits[2]);     // 'ばなな'
+        console.log('配列の長さ:', fruits.length); // 3
+
+        // 要素の追加
+        console.log('--- 要素を追加 ---');
+        fruits.push('ぶどう');
+        console.log('追加後のfruits:', fruits);
+        console.log('新しい長さ:', fruits.length);
+
+        // ループで全要素を表示
+        console.log('--- 全要素をループで表示 ---');
+        for (let i = 0; i < fruits.length; i++) {
+            console.log(`${i}番目: ${fruits[i]}`);
+        }
+
+        // より実用的な例：数値の配列
+        console.log('--- 数値配列の例 ---');
+        let scores = [85, 92, 78, 96, 88];
+        console.log('scores:', scores);
+
+        // 合計計算
+        let sum = 0;
+        for (let i = 0; i < scores.length; i++) {
+            sum += scores[i];
+            console.log(`${i}番目: ${scores[i]}, 累計: ${sum}`);
+        }
+        console.log('合計点:', sum);
+        console.log('平均点:', sum / scores.length);
+
+        // Kintoneでよくある：レコード一覧の処理例
+        console.log('--- レコード一覧の例 ---');
+        let records = [
+            { "名前": "田中", "点数": 85 },
+            { "名前": "佐藤", "点数": 92 },
+            { "名前": "鈴木", "点数": 78 }
+        ];
+
+        console.log('records:', records);
+        for (let i = 0; i < records.length; i++) {
+            let record = records[i];
+            console.log(`${record.名前}さん: ${record.点数}点`);
+        }
+    </script>
+</body>
+
+</html>

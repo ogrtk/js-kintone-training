@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>JavaScript基礎 - デモ1</title>
+</head>
+
+<body>
+    <h1>JavaScript基礎 - デモ1</h1>
+    <p>F12を押して開発者ツールのConsoleタブを確認してください</p>
+
+    <input type="text" id="name" value="田中">
+    <button id="btn">送信</button>
+
+    <script>
+        // コンソールにメッセージを出力
+        console.log('JavaScriptが動いています！');
+        console.log('現在の時刻:', new Date());
+
+        // ボタンがクリックされたときの処理
+        document.getElementById('btn').onclick = function () {
+            let nameValue = document.getElementById('name').value;
+            console.log('入力された名前:', nameValue);
+            alert('送信されました：' + nameValue);
+        };
+
+        // ページ読み込み完了時の処理
+        console.log('ページが読み込まれました');
+    </script>
+</body>
+
+</html>

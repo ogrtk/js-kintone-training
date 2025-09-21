@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>JavaScript基礎 - 関数</title>
+</head>
+
+<body>
+    <h1>JavaScript基礎 - 関数デモ</h1>
+    <p>F12でConsoleを確認してください</p>
+
+    <script>
+        console.log('=== 関数のデモ ===');
+
+        // 基本的な関数
+        function calculateTotal(price, quantity) {
+            console.log('calculateTotal関数が呼ばれました');
+            console.log('price:', price, 'quantity:', quantity);
+            let result = price * quantity;
+            console.log('計算結果:', result);
+            return result;
+        }
+
+        // 短い書き方（アロー関数）
+        const calculateTotalArrow = (price, quantity) => {
+            console.log('アロー関数が呼ばれました');
+            return price * quantity;
+        };
+
+        // 関数の呼び出し
+        console.log('--- 通常の関数を実行 ---');
+        let total1 = calculateTotal(100, 5);
+        console.log('結果1:', total1);
+
+        console.log('--- アロー関数を実行 ---');
+        let total2 = calculateTotalArrow(200, 3);
+        console.log('結果2:', total2);
+
+        // より実用的な例
+        function validateInput(value) {
+            console.log('入力値をチェック:', value);
+            if (value === '' || value == null) {
+                console.log('エラー: 値が空です');
+                return false;
+            }
+            console.log('チェックOK');
+            return true;
+        }
+
+        // テスト実行
+        console.log('--- バリデーションテスト ---');
+        validateInput('有効な値');
+        validateInput('');
+        validateInput(null);
+    </script>
+</body>
+
+</html>

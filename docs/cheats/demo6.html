@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>JavaScript基礎 - 条件分岐</title>
+</head>
+
+<body>
+    <h1>JavaScript基礎 - 条件分岐デモ</h1>
+    <p>F12でConsoleを確認してください</p>
+
+    <script>
+        console.log('=== 条件分岐のデモ ===');
+
+        // 基本的な条件分岐
+        function checkScore(score) {
+            console.log(`--- ${score}点の評価 ---`);
+
+            if (score >= 90) {
+                console.log('評価: 優秀です');
+                return '優秀';
+            } else if (score >= 70) {
+                console.log('評価: 合格です');
+                return '合格';
+            } else {
+                console.log('評価: 再試験です');
+                return '再試験';
+            }
+        }
+
+        // テスト実行
+        checkScore(95);
+        checkScore(85);
+        checkScore(65);
+
+        // より実用的な例：入力チェック
+        console.log('--- 入力チェックの例 ---');
+        function validateQuantity(quantity) {
+            console.log(`数量をチェック: ${quantity}`);
+
+            if (quantity === '' || quantity == null) {
+                console.log('エラー: 数量が入力されていません');
+                return false;
+            } else if (isNaN(quantity)) {
+                console.log('エラー: 数値ではありません');
+                return false;
+            } else if (quantity <= 0) {
+                console.log('エラー: 0以下の値です');
+                return false;
+            } else if (quantity > 1000) {
+                console.log('警告: 1000を超えています');
+                return 'warning';
+            } else {
+                console.log('チェックOK');
+                return true;
+            }
+        }
+
+        // バリデーションテスト
+        validateQuantity('');
+        validateQuantity('abc');
+        validateQuantity(-5);
+        validateQuantity(1500);
+        validateQuantity(10);
+
+        // Kintoneでよくある：ステータスによる処理分岐
+        console.log('--- ステータス処理の例 ---');
+        function processStatus(status) {
+            console.log(`ステータス処理: ${status}`);
+
+            switch (status) {
+                case '未処理':
+                    console.log('→ 処理待ちです');
+                    break;
+                case '処理中':
+                    console.log('→ 現在処理中です');
+                    break;
+                case '完了':
+                    console.log('→ 処理が完了しています');
+                    break;
+                default:
+                    console.log('→ 不明なステータスです');
+            }
+        }
+
+        processStatus('未処理');
+        processStatus('処理中');
+        processStatus('完了');
+        processStatus('不明');
+    </script>
+</body>
+
+</html>

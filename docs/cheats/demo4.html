@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>JavaScript基礎 - オブジェクト</title>
+</head>
+<body>
+    <h1>JavaScript基礎 - オブジェクトデモ</h1>
+    <p>F12でConsoleを確認してください</p>
+    <script>
+        console.log('=== オブジェクトのデモ ===');
+
+        // オブジェクトの作成
+        let user = {
+            name: '田中',
+            age: 30,
+            email: 'tanaka@example.com'
+        };
+
+        console.log('user オブジェクト全体:', user);
+
+        // 値の取得
+        console.log('user.name:', user.name);
+        console.log('user["name"]:', user['name']);  // 同じ結果
+        console.log('user.age:', user.age);
+        console.log('user.email:', user.email);
+
+        // 値の設定
+        console.log('--- 値を変更します ---');
+        user.name = '佐藤';
+        user['age'] = 31;
+        console.log('変更後 user.name:', user.name);
+        console.log('変更後 user.age:', user.age);
+
+        // 新しいプロパティの追加
+        user.department = '営業部';
+        console.log('追加後のuser:', user);
+
+        // Kintoneのレコード形式の例
+        console.log('--- Kintoneレコード形式の例 ---');
+        let record = {
+            "商品名": { "value": "ノートパソコン" },
+            "単価": { "value": "50000" },
+            "数量": { "value": "2" }
+        };
+
+        console.log('recordオブジェクト:', record);
+        console.log('商品名:', record["商品名"].value);
+        console.log('単価:', record["単価"].value);
+        console.log('数量:', record["数量"].value);
+
+        // 合計計算
+        let price = parseInt(record["単価"].value);
+        let quantity = parseInt(record["数量"].value);
+        let total = price * quantity;
+        console.log('合計:', total);
+    </script>
+</body>
+
+</html>

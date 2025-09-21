@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>JavaScript基礎 - 総合デモ</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+        }
+
+        .section {
+            border: 1px solid #ccc;
+            margin: 10px 0;
+            padding: 15px;
+        }
+
+        .section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        input,
+        button {
+            margin: 5px;
+            padding: 8px;
+        }
+
+        button {
+            background-color: #007cba;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #005a87;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>JavaScript基礎 - 総合デモ</h1>
+    <p><strong>F12を押してConsoleタブを確認してください</strong></p>
+
+    <div class="section">
+        <h3>1. 変数テスト</h3>
+        <button onclick="testVariables()">変数をテスト</button>
+    </div>
+
+    <div class="section">
+        <h3>2. 関数テスト</h3>
+        <input type="number" id="price" placeholder="単価" value="100">
+        <input type="number" id="quantity" placeholder="数量" value="5">
+        <button onclick="testFunctions()">計算実行</button>
+        <p id="result"></p>
+    </div>
+
+    <div class="section">
+        <h3>3. オブジェクトテスト</h3>
+        <button onclick="testObjects()">オブジェクトをテスト</button>
+    </div>
+
+    <div class="section">
+        <h3>4. 配列テスト</h3>
+        <button onclick="testArrays()">配列をテスト</button>
+    </div>
+
+    <div class="section">
+        <h3>5. 条件分岐テスト</h3>
+        <input type="number" id="scoreInput" placeholder="点数を入力" value="85">
+        <button onclick="testConditions()">評価を確認</button>
+        <p id="evaluation"></p>
+    </div>
+
+    <div class="section">
+        <h3>6. Kintoneっぽいデータ操作</h3>
+        <button onclick="testKintoneStyle()">レコード操作をテスト</button>
+    </div>
+
+    <script>
+        console.log('総合デモページが読み込まれました');
+
+        // 1. 変数テスト
+        function testVariables() {
+            console.log('=== 変数テスト開始 ===');
+
+            let name = '田中太郎';
+            const companyName = 'サイボウズ';
+            let age = 30;
+            let isActive = true;
+
+            console.log('名前:', name);
+            console.log('会社名:', companyName);
+            console.log('年齢:', age);
+            console.log('アクティブ:', isActive);
+
+            // 変数の変更
+            name = '佐藤花子';
+            age = 25;
+            console.log('変更後 - 名前:', name, '年齢:', age);
+
+            alert('変数テスト完了！Consoleを確認してください');
+        }
+
+        // 2. 関数テスト
+        function testFunctions() {
+            console.log('=== 関数テスト開始 ===');
+
+            let price = parseInt(document.getElementById('price').value);
+            let quantity = parseInt(document.getElementById('quantity').value);
+
+            console.log('入力値 - 単価:', price, '数量:', quantity);
+
+            // 通常の関数
+            function calculateTotal(p, q) {
+                console.log('calculateTotal関数実行中...');
+                return p * q;
+            }
+
+            // アロー関数
+            const calculateTax = (amount) => {
+                console.log('消費税計算中...');
+                return Math.floor(amount * 1.1);
+            };
+
+            let total = calculateTotal(price, quantity);
+            let totalWithTax = calculateTax(total);
+
+            console.log('小計:', total);
+            console.log('税込合計:', totalWithTax);
+
+            document.getElementById('result').innerHTML =
+                `小計: ${total}円<br>税込合計: ${totalWithTax}円`;
+        }
+
+        // 3. オブジェクトテスト
+        function testObjects() {
+            console.log('=== オブジェクトテスト開始 ===');
+
+            // 基本的なオブジェクト
+            let user = {
+                name: '田中太郎',
+                department: '営業部',
+                email: 'tanaka@cybozu.co.jp',
+                skills: ['JavaScript', 'Kintone', 'Excel']
+            };
+
+            console.log('ユーザー情報:', user);
+            console.log('名前:', user.name);
+            console.log('部署:', user['department']);
+            console.log('スキル一覧:', user.skills);
+
+            // Kintone風のレコードオブジェクト
+            let record = {
+                "顧客名": { "value": "ABC商事" },
+                "担当者": { "value": "田中太郎" },
+                "売上": { "value": "1000000" },
+                "契約日": { "value": "2024-01-15" }
+            };
+
+            console.log('レコード:', record);
+            console.log('顧客名:', record["顧客名"].value);
+            console.log('売上:', record["売上"].value);
+
+            alert('オブジェクトテスト完了！');
+        }
+
+        // 4. 配列テスト
+        function testArrays() {
+            console.log('=== 配列テスト開始 ===');
+
+            let products = ['ノートPC', 'マウス', 'キーボード', 'モニター'];
+            console.log('商品リスト:', products);
+            console.log('商品数:', products.length);
+
+            // 全要素を表示
+            console.log('--- 全商品 ---');
+            for (let i = 0; i < products.length; i++) {
+                console.log(`${i + 1}. ${products[i]}`);
+            }
+
+            // 新商品追加
+            products.push('プリンター');
+            console.log('追加後:', products);
+
+            // 売上データの配列
+            let salesData = [
+                { month: '1月', amount: 1000000 },
+                { month: '2月', amount: 1200000 },
+                { month: '3月', amount: 980000 }
+            ];
+
+            console.log('--- 売上データ ---');
+            let totalSales = 0;
+            for (let i = 0; i < salesData.length; i++) {
+                console.log(`${salesData[i].month}: ${salesData[i].amount}円`);
+                totalSales += salesData[i].amount;
+            }
+            console.log('合計売上:', totalSales);
+
+            alert('配列テスト完了！');
+        }
+
+        // 5. 条件分岐テスト
+        function testConditions() {
+            console.log('=== 条件分岐テスト開始 ===');
+
+            let score = parseInt(document.getElementById('scoreInput').value);
+            console.log('入力された点数:', score);
+
+            let evaluation = '';
+            let message = '';
+
+            if (score >= 90) {
+                evaluation = 'S';
+                message = '優秀です！';
+                console.log('評価: S (90点以上)');
+            } else if (score >= 80) {
+                evaluation = 'A';
+                message = '良好です';
+                console.log('評価: A (80-89点)');
+            } else if (score >= 70) {
+                evaluation = 'B';
+                message = '合格です';
+                console.log('評価: B (70-79点)');
+            } else if (score >= 60) {
+                evaluation = 'C';
+                message = '要努力';
+                console.log('評価: C (60-69点)');
+            } else {
+                evaluation = 'D';
+                message = '再試験';
+                console.log('評価: D (60点未満)');
+            }
+
+            // 追加チェック
+            if (score < 0 || score > 100) {
+                message = '点数が範囲外です（0-100で入力）';
+                console.log('エラー: 点数範囲外');
+            }
+
+            document.getElementById('evaluation').innerHTML =
+                `評価: ${evaluation}<br>${message}`;
+        }
+
+        // 6. Kintoneスタイルのデータ操作
+        function testKintoneStyle() {
+            console.log('=== Kintoneスタイルテスト開始 ===');
+
+            // レコードの例（Kintoneから取得した想定）
+            let record = {
+                "商品名": { "value": "ノートパソコン" },
+                "単価": { "value": "80000" },
+                "数量": { "value": "3" },
+                "割引率": { "value": "10" },
+                "合計": { "value": "" }  // これを計算で設定
+            };
+
+            console.log('処理前のレコード:', record);
+
+            // 値の取得と計算
+            let productName = record["商品名"].value;
+            let unitPrice = parseInt(record["単価"].value) || 0;
+            let quantity = parseInt(record["数量"].value) || 0;
+            let discountRate = parseInt(record["割引率"].value) || 0;
+
+            console.log('商品名:', productName);
+            console.log('単価:', unitPrice);
+            console.log('数量:', quantity);
+            console.log('割引率:', discountRate + '%');
+
+            // 計算処理
+            let subtotal = unitPrice * quantity;
+            let discount = Math.floor(subtotal * discountRate / 100);
+            let total = subtotal - discount;
+
+            console.log('小計:', subtotal);
+            console.log('割引額:', discount);
+            console.log('合計:', total);
+
+            // レコードに結果を設定
+            record["合計"].value = total.toString();
+
+            console.log('処理後のレコード:', record);
+
+            // バリデーション例
+            if (total > 500000) {
+                console.log('警告: 合計金額が50万円を超えています');
+            }
+
+            if (quantity <= 0) {
+                console.log('エラー: 数量は1以上で入力してください');
+            }
+
+            alert('Kintoneスタイルテスト完了！詳細はConsoleを確認してください');
+        }
+
+        // ページ読み込み時の初期化
+        console.log('すべての関数が準備完了しました！');
+        console.log('各ボタンをクリックして動作を確認してください');
+    </script>
+</body>
+
+</html>

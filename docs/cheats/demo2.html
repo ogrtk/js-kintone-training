@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>JavaScript基礎 - 変数</title>
+</head>
+
+<body>
+    <h1>JavaScript基礎 - 変数デモ</h1>
+    <p>F12でConsoleを確認してください</p>
+
+    <script>
+        console.log('=== 変数のデモ ===');
+
+        // 変数の宣言
+        let name = '田中';           // 変更可能
+        const price = 1000;         // 変更不可
+        var old_style = '古い書き方'; // 古い書き方なので使わないこと！!
+
+        console.log('name:', name);
+        console.log('price:', price);
+
+        // 変数の変更
+        name = '佐藤';
+        console.log('変更後のname:', name);
+
+        // const は変更できない（エラーになる）
+        // price = 2000;  // この行のコメントを外すとエラーになる
+
+        // データ型の確認
+        let text = '文字列';        // 文字列
+        let number = 100;          // 数値
+        let flag = true;           // 真偽値（true/false）
+
+        console.log('text:', text, 'typeof:', typeof text);
+        console.log('number:', number, 'typeof:', typeof number);
+        console.log('flag:', flag, 'typeof:', typeof flag);
+
+        text = text + name;
+        console.log('演算後のtext:', text);
+
+        number = number + price;
+        console.log('演算後のnumber:', number);
+
+        text = text + number;
+        console.log('文字列+数値で演算後のtext:', text);
+
+    </script>
+</body>
+
+</html>

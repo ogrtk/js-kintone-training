@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Kintone実践練習</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .kintone-form {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            max-width: 600px;
+        }
+
+        .field-group {
+            margin: 15px 0;
+        }
+
+        label {
+            display: inline-block;
+            width: 100px;
+            font-weight: bold;
+        }
+
+        input,
+        select {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .readonly {
+            background-color: #f0f0f0;
+        }
+
+        .error {
+            border-color: red;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 12px;
+        }
+
+        .success {
+            border-color: green;
+        }
+
+        button {
+            background: #007cba;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background: #005a87;
+        }
+
+        .event-log {
+            background: #f9f9f9;
+            padding: 10px;
+            border-left: 4px solid #007cba;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Kintone実践練習 - 疑似レコード画面</h1>
+    <p><strong>F12でConsoleを開いて、Kintoneイベントの動作を確認しましょう</strong></p>
+
+    <div class="kintone-form">
+        <h2>商品管理レコード</h2>
+
+        <div class="field-group">
+            <label>商品名:</label>
+            <input type="text" id="product_name" value="ノートパソコン">
+        </div>
+
+        <div class="field-group">
+            <label>単価:</label>
+            <input type="number" id="unit_price" value="50000">
+        </div>
+
+        <div class="field-group">
+            <label>数量:</label>
+            <input type="number" id="quantity" value="2">
+        </div>
+
+        <div class="field-group">
+            <label>割引率(%):</label>
+            <input type="number" id="discount_rate" value="10" max="50">
+        </div>
+
+        <div class="field-group">
+            <label>小計:</label>
+            <input type="number" id="subtotal" class="readonly" readonly>
+        </div>
+
+        <div class="field-group">
+            <label>割引額:</label>
+            <input type="number" id="discount_amount" class="readonly" readonly>
+        </div>
+
+        <div class="field-group">
+            <label>合計:</label>
+            <input type="number" id="total" class="readonly" readonly>
+        </div>
+
+        <div class="field-group">
+            <label>ステータス:</label>
+            <select id="status">
+                <option value="未処理">未処理</option>
+                <option value="確認中">確認中</option>
+                <option value="承認済み">承認済み</option>
+            </select>
+        </div>
+
+        <div class="field-group">
+            <label>特記事項:</label>
+            <input type="text" id="notes" placeholder="承認済みの場合のみ表示">
+        </div>
+
+        <div id="error-messages"></div>
+
+        <button onclick="simulateShow()">画面表示イベント実行</button>
+        <button onclick="simulateSubmit()">保存前イベント実行</button>
+        <button onclick="clearLog()">ログクリア</button>
+    </div>
+
+    <div class="event-log">
+        <h3>イベントログ</h3>
+        <div id="event-log-content">ここにイベントの実行結果が表示されます</div>
+    </div>
+
+    <script>
+        // 疑似的なKintoneレコード構造
+        let mockRecord = {};
+
+        // ログ出力関数
+        function logEvent(message, type = 'info') {
+            console.log(message);
+            let logElement = document.getElementById('event-log-content');
+            let timestamp = new Date().toLocaleTimeString();
+            let color = type === 'error' ? 'red' : type === 'warning' ? 'orange' : 'black';
+            logElement.innerHTML += `<div style="color: ${color}; margin: 2px 0;">
+                [${timestamp}] ${message}</div>`;
+        }
+
+        // DOM要素をmockRecordに同期
+        function syncToMockRecord() {
+            mockRecord = {
+                "商品名": { "value": document.getElementById('product_name').value },
+                "単価": { "value": document.getElementById('unit_price').value },
+                "数量": { "value": document.getElementById('quantity').value },
+                "割引率": { "value": document.getElementById('discount_rate').value },
+                "小計": { "value": document.getElementById('subtotal').value },
+                "割引額": { "value": document.getElementById('discount_amount').value },
+                "合計": { "value": document.getElementById('total').value },
+                "ステータス": { "value": document.getElementById('status').value },
+                "特記事項": { "value": document.getElementById('notes').value }
+            };
+        }
+
+        // mockRecordをDOM要素に同期
+        function syncFromMockRecord() {
+            document.getElementById('product_name').value = mockRecord["商品名"].value;
+            document.getElementById('unit_price').value = mockRecord["単価"].value;
+            document.getElementById('quantity').value = mockRecord["数量"].value;
+            document.getElementById('discount_rate').value = mockRecord["割引率"].value;
+            document.getElementById('subtotal').value = mockRecord["小計"].value;
+            document.getElementById('discount_amount').value = mockRecord["割引額"].value;
+            document.getElementById('total').value = mockRecord["合計"].value;
+            document.getElementById('status').value = mockRecord["ステータス"].value;
+            document.getElementById('notes').value = mockRecord["特記事項"].value;
+        }
+
+        // Kintone風のイベント処理群
+
+        // 1. 画面表示時の処理（app.record.detail.show相当）
+        function onRecordShow() {
+            logEvent('=== app.record.detail.show イベント実行 ===');
+            logEvent('レコード詳細画面が表示されました');
+
+            let record = mockRecord;
+
+            // 初期計算実行
+            calculateTotal();
+
+            // ステータスによる制御
+            controlFieldsByStatus();
+
+            logEvent('画面表示時の処理完了');
+            return true;
+        }
+
+        // 2. フィールド変更時の処理（app.record.edit.change相当）
+        function onQuantityChange() {
+            logEvent('=== app.record.edit.change.数量 イベント実行 ===');
+            syncToMockRecord();
+
+            let record = mockRecord;
+            let quantity = parseInt(record["数量"].value) || 0;
+
+            logEvent(`数量が変更されました: ${quantity}`);
+
+            // バリデーション
+            if (quantity < 0) {
+                logEvent('エラー: 数量に負の数は入力できません', 'error');
+                document.getElementById('quantity').classList.add('error');
+                record["数量"].value = "0";
+                quantity = 0;
+            } else {
+                document.getElementById('quantity').classList.remove('error');
+            }
+
+            // 自動計算
+            calculateTotal();
+
+            // 警告チェック
+            let total = parseInt(record["合計"].value) || 0;
+            if (total > 100000) {
+                logEvent('警告: 合計金額が10万円を超えています', 'warning');
+            }
+
+            syncFromMockRecord();
+            return true;
+        }
+
+        // 3. ステータス変更時の処理
+        function onStatusChange() {
+            logEvent('=== app.record.edit.change.ステータス イベント実行 ===');
+            syncToMockRecord();
+
+            let record = mockRecord;
+            let status = record["ステータス"].value;
+
+            logEvent(`ステータスが変更されました: ${status}`);
+
+            controlFieldsByStatus();
+
+            syncFromMockRecord();
+            return true;
+        }
+
+        // 4. 保存前処理（app.record.create.submit相当）
+        function onRecordSubmit() {
+            logEvent('=== app.record.create.submit イベント実行 ===');
+            syncToMockRecord();
+
+            let record = mockRecord;
+            let errors = [];
+
+            // 必須チェック
+            if (!record["商品名"].value.trim()) {
+                errors.push('商品名は必須です');
+            }
+
+            let quantity = parseInt(record["数量"].value) || 0;
+            if (quantity <= 0) {
+                errors.push('数量は1以上で入力してください');
+            }
+
+            let unitPrice = parseInt(record["単価"].value) || 0;
+            if (unitPrice <= 0) {
+                errors.push('単価は1以上で入力してください');
+            }
+
+            // 承認済みの場合の特記事項チェック
+            if (record["ステータス"].value === '承認済み' && !record["特記事項"].value.trim()) {
+                errors.push('承認済みの場合は特記事項が必須です');
+            }
+
+            // エラー表示
+            let errorElement = document.getElementById('error-messages');
+            if (errors.length > 0) {
+                logEvent(`保存前エラー: ${errors.join(', ')}`, 'error');
+                errorElement.innerHTML = errors.map(err =>
+                    `<div class="error-message">● ${err}</div>`).join('');
+                return false;
+            } else {
+                errorElement.innerHTML = '';
+                logEvent('バリデーション通過 - 保存可能です');
+                return true;
+            }
+        }
+
+        // 補助関数群
+
+        function calculateTotal() {
+            let record = mockRecord;
+
+            let unitPrice = parseInt(record["単価"].value) || 0;
+            let quantity = parseInt(record["数量"].value) || 0;
+            let discountRate = parseInt(record["割引率"].value) || 0;
+
+            let subtotal = unitPrice * quantity;
+            let discountAmount = Math.floor(subtotal * discountRate / 100);
+            let total = subtotal - discountAmount;
+
+            record["小計"].value = subtotal.toString();
+            record["割引額"].value = discountAmount.toString();
+            record["合計"].value = total.toString();
+
+            logEvent(`計算実行: ${unitPrice} × ${quantity} - ${discountAmount} = ${total}`);
+        }
+
+        function controlFieldsByStatus() {
+            let record = mockRecord;
+            let status = record["ステータス"].value;
+            let notesField = document.getElementById('notes');
+
+            if (status === '承認済み') {
+                notesField.style.display = 'inline-block';
+                notesField.placeholder = '承認済みのため入力必須';
+                logEvent('特記事項フィールドを表示');
+            } else {
+                notesField.style.display = 'none';
+                logEvent('特記事項フィールドを非表示');
+            }
+        }
+
+        // 疑似イベント実行関数
+        function simulateShow() {
+            syncToMockRecord();
+            onRecordShow();
+        }
+
+        function simulateSubmit() {
+            syncToMockRecord();
+            if (onRecordSubmit()) {
+                alert('保存処理が実行されました！');
+            } else {
+                alert('エラーがあります。修正してください。');
+            }
+        }
+
+        function clearLog() {
+            document.getElementById('event-log-content').innerHTML = 'ログをクリアしました';
+        }
+
+        // リアルタイムイベントリスナー
+        document.getElementById('quantity').addEventListener('input', onQuantityChange);
+        document.getElementById('unit_price').addEventListener('input', () => {
+            syncToMockRecord();
+            calculateTotal();
+            syncFromMockRecord();
+        });
+        document.getElementById('discount_rate').addEventListener('input', () => {
+            syncToMockRecord();
+            calculateTotal();
+            syncFromMockRecord();
+        });
+        document.getElementById('status').addEventListener('change', onStatusChange);
+
+        // 初期化
+        syncToMockRecord();
+        logEvent('Kintone実践練習ページが初期化されました');
+        logEvent('フィールドを変更してイベントの動作を確認してください');
+    </script>
+</body>
+
+</html>
