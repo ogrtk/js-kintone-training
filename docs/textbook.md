@@ -14,7 +14,7 @@
 
 まず、以下のHTMLファイルを作成して、ブラウザで開いてみましょう。
 
-**demo1.html**
+**javascript_practice_1.html**
 
 ```html
 <!DOCTYPE html>
@@ -51,7 +51,7 @@
 
 **確認方法**
 
-1. 上記のコードを `demo1.html` として保存
+1. 上記のコードを `javascript_practice_1.html` として保存
 2. ブラウザで開く
 3. **F12** を押して開発者ツールを開く
 4. **Console** タブを確認
@@ -90,7 +90,7 @@ let element = document.querySelector('.item');    // クラス
 
 ### 変数の使い方
 
-**demo2.html**
+**javascript_practice_2.html**
 
 ```html
 <!DOCTYPE html>
@@ -152,7 +152,7 @@ let element = document.querySelector('.item');    // クラス
 
 ### 関数の書き方
 
-**demo3.html**
+**javascript_practice_3.html**
 
 ```html
 <!DOCTYPE html>
@@ -215,7 +215,7 @@ let element = document.querySelector('.item');    // クラス
 
 ### オブジェクトの操作
 
-**demo4.html**
+**javascript_practice_4.html**
 
 ```html
 <!DOCTYPE html>
@@ -304,7 +304,7 @@ let element = document.querySelector('.item');    // クラス
 
 ### 配列の基本
 
-**demo5.html**
+**javascript_practice_5.html**
 
 ```html
 <!DOCTYPE html>
@@ -376,7 +376,7 @@ let element = document.querySelector('.item');    // クラス
 
 ### 条件分岐
 
-**demo6.html**
+**javascript_practice_6.html**
 
 ```html
 <!DOCTYPE html>
@@ -492,14 +492,14 @@ JavaScriptの基礎を学んだところで、Kintoneカスタマイズに入る
 - マウスの移動
 - フォームの送信 など
 
-demo1.htmlでボタンをクリックしたときに起きたことを思い出してください：
+javascript_practice_1.htmlでボタンをクリックしたときに起きたことを思い出してください：
 
 - 「ボタンをクリックした」→これが**イベント**
 - 「アラートが表示された」→これが**イベントへの反応**
 
 ### イベントリスナーの仕組み
 
-demo1.htmlの中には、実際にこのようなコードが書かれています：
+javascript_practice_1.htmlの中には、実際にこのようなコードが書かれています：
 
 ```javascript
 document.getElementById('btn').onclick = function() {
@@ -879,6 +879,27 @@ kintone.events.on('app.record.edit.change.数量', function(event) {
 > kintoneにはそうした仕組みが備わっていません。
 > 利害の異なる第三者に利用させる想定の場合は、こうした点にも注意しましょう。
 
+### カスタマイズ処理でよく使うJavaScript例
+
+```javascript
+// 数値変換（エラーの場合は0）
+let num = parseInt(value) || 0;
+
+// 文字列の長さチェック
+if (text.length > 10) { /* 処理 */ }
+
+// 配列の操作
+array.push(item);        // 追加
+array.length;            // 長さ
+array[0];               // 最初の要素
+
+// 日付操作
+let now = new Date();
+let year = now.getFullYear();
+let month = now.getMonth() + 1;  // 注意: 0から始まる
+let date = now.getDate();
+```
+
 ---
 
 ## 5. デバッグ・トラブル対応（10分）
@@ -901,26 +922,7 @@ console.log('変数の値:', variable);
 event.error = 'エラーメッセージ';
 ```
 
-### よく使うJavaScript
 
-```javascript
-// 数値変換（エラーの場合は0）
-let num = parseInt(value) || 0;
-
-// 文字列の長さチェック
-if (text.length > 10) { /* 処理 */ }
-
-// 配列の操作
-array.push(item);        // 追加
-array.length;            // 長さ
-array[0];               // 最初の要素
-
-// 日付操作
-let now = new Date();
-let year = now.getFullYear();
-let month = now.getMonth() + 1;  // 注意: 0から始まる
-let date = now.getDate();
-```
 
 ### デバッグに役立つConsoleコマンド
 
@@ -940,6 +942,151 @@ console.warn('警告メッセージ');
 
 // テーブル形式で表示（配列に便利）
 console.table(配列);
+```
+
+### ブレークポイントを使ったデバッグ実習
+
+実際のコードでブレークポイントを使ったデバッグを体験してみましょう。
+
+#### 実習用ファイル
+
+**debug_practice_buggy.js** - バグを含むkintoneカスタマイズコード
+
+```javascript
+// kintoneカスタマイズ - デバッグ実習用（バグあり版）
+// 単価×数量→合計の自動計算機能
+
+(function() {
+    'use strict';
+
+    // 数量または単価が変更された時の計算処理
+    kintone.events.on(['app.record.create.change.数量', 'app.record.create.change.単価'], function(event) {
+        console.log('計算処理開始');
+
+        const record = event.record;
+        const unitPrice = record.単価.value;
+        const quantity = record.数量.value;
+
+        console.log('単価:', unitPrice);
+        console.log('数量:', quantity);
+
+        // バグ1: 文字列の数値変換が不適切（文字列のまま計算）
+        const total = unitPrice + quantity;
+
+        console.log('計算結果:', total);
+
+        // 合計フィールドに結果を設定
+        record.合計.value = total;
+
+        return event;
+    });
+
+    // レコード保存時の検証
+    kintone.events.on(['app.record.create.submit','app.record.edit.submit'], function(event) {
+        console.log('保存時検証開始');
+
+        const record = event.record;
+        const quantity = parseInt(record.数量.value);
+
+        console.log('数量チェック:', quantity);
+
+        // バグ2: 条件判定の論理演算子が間違っている
+        if (quantity < 1 && quantity > 100) {
+            console.log('数量エラー検出');
+            event.error = '数量は1以上100以下で入力してください';
+            return event;
+        }
+
+        console.log('検証完了');
+        return event;
+    });
+
+})();
+```
+
+#### デバッグ手順
+
+**1. ブレークポイントの設定**
+1. Chrome開発者ツールを開く（F12）
+2. Sourcesタブを選択
+3. `debug_practice_buggy.js` を探す
+4. 以下の行にブレークポイントを設定：
+   - 19行目（計算処理）
+   - 39行目（条件判定）
+
+**2. バグ1の確認手順**
+1. 単価に `100`、数量に `5` を入力
+2. ブレークポイント（19行目）で停止
+3. 変数の値を確認：
+   ```
+   unitPrice → "100" (文字列)
+   quantity → "5" (文字列)
+   total → "1005" (文字列連結)
+   ```
+
+**3. バグ2の確認手順**
+1. 数量に `150` を入力して保存
+2. ブレークポイント（39行目）で停止
+3. 条件を確認：
+   ```
+   quantity → 150
+   quantity < 1 → false
+   quantity > 100 → true
+   false && true → false (エラーが出ない)
+   ```
+
+**4. 変数の監視方法**
+- **Variables パネル**: 現在のスコープの変数
+- **Watch パネル**: 監視したい式を追加
+- **Console**: `console.log(変数名)` で値を確認
+
+**5. 修正版コード**
+
+```javascript
+// kintoneカスタマイズ - 修正版
+(function() {
+    'use strict';
+
+    kintone.events.on(['app.record.create.change.数量', 'app.record.create.change.単価'], function(event) {
+        console.log('計算処理開始');
+
+        const record = event.record;
+        // 修正: 数値に変換
+        const unitPrice = parseInt(record.単価.value) || 0;
+        const quantity = parseInt(record.数量.value) || 0;
+
+        console.log('単価:', unitPrice);
+        console.log('数量:', quantity);
+
+        // 修正: 数値として計算
+        const total = unitPrice * quantity;
+
+        console.log('計算結果:', total);
+        record.合計.value = total;
+
+        return event;
+    });
+
+    kintone.events.on(['app.record.create.submit','app.record.edit.submit'], function(event) {
+        console.log('保存時検証開始');
+
+        const record = event.record;
+        const quantity = parseInt(record.数量.value);
+
+        console.log('数量チェック:', quantity);
+
+        // 修正: OR演算子に変更
+        if (quantity < 1 || quantity > 100) {
+            console.log('数量エラー検出');
+            event.error = '数量は1以上100以下で入力してください';
+            return event;
+        }
+
+        console.log('検証完了');
+        return event;
+    });
+
+})();
 ```
 
 ---
@@ -977,56 +1124,28 @@ console.table(配列);
 
 ```javascript
 // FormBridgeのカスタマイズ例
-fb.events.on('form.submit.success', function(event) {
-    // フォーム送信成功時の処理
-    alert('お問い合わせありがとうございました');
-    console.log('フォーム送信完了:', event);
-    return event;
+formBridge.events.on('form.field.change.single_line_text', function (context) {
+  // 変更前の値
+  const value = context.value;
+  // ...value を用いた処理...
 });
 
-fb.events.on('form.field.change', function(event) {
-    // フィールド変更時の処理
-    let fieldCode = event.fieldCode;
-    let value = event.value;
-    
-    // 今日学んだバリデーション技術がそのまま使える
-    if (fieldCode === 'email' && !value.includes('@')) {
-        alert('正しいメールアドレスを入力してください');
-    }
-    
-    return event;
-});
-
-fb.events.on('form.show', function(event) {
-    // フォーム表示時の処理
-    console.log('フォームが表示されました');
-    return event;
+formBridge.events.on('form.submitted', function (context) {
+  // 完了画面を表示せずに https://example.com へリダイレクト
+  context.preventDefault();
+  window.location.href = 'https://example.com';
 });
 ```
 
 ### kViewer
 
-**kViewer**は、Kintoneのデータを使ってダッシュボードやレポートを作成するサービスです。
+**kViewer**は、Kintoneのデータを使ってダッシュボードやレポートを作成するサービスです。同様にイベント起点でのカスタマイズ処理を記述可能です。
 
 ```javascript
 // kViewerのカスタマイズ例
-kv.events.on('view.ready', function(event) {
-    // ビュー表示完了時の処理
-    console.log('ダッシュボードの準備完了');
-    return event;
-});
-
-kv.events.on('view.data.updated', function(event) {
-    // データ更新時の処理
-    let data = event.data;
-    console.log('データが更新されました:', data);
-    
-    // 条件による表示制御
-    if (data.totalSales > 1000000) {
-        alert('売上目標を達成しました！');
-    }
-    
-    return event;
+kviewer.events.on('records.show', function (context) {
+	const $records = context.getRecordElements();
+	// 任意の処理
 });
 ```
 
@@ -1036,13 +1155,12 @@ kv.events.on('view.data.updated', function(event) {
 
 1. **イベントリスナーの仕組み**
    - Kintone: `kintone.events.on()`
-   - FormBridge: `fb.events.on()`
-   - kViewer: `kv.events.on()`
+   - FormBridge: `formBridge.events.on()`
+   - kViewer: `kviewer.events.on()`
 
 2. **コールバック関数の概念**
    - 第1引数：イベント名
    - 第2引数：実行する関数
-   - 必ず`return event`
 
 3. **デバッグ方法**
    - F12 → Console確認
@@ -1066,13 +1184,13 @@ kv.events.on('view.data.updated', function(event) {
 
 #### FormBridge開発者向け情報
 
-- **URL**: <https://formbridge.cybozu.io/docs/>
+- **URL**: <https://form.kintoneapp.com/help/customize/v2>
 - **内容**: WebサイトへのKintoneフォーム埋め込みとカスタマイズ
 - **特徴**: フォームデザインのカスタマイズ、送信後処理など
 
 #### kViewer開発者向け情報
 
-- **URL**: <https://kviewer.cybozu.io/docs/>
+- **URL**: <https://kviewer.kintoneapp.com/help/customize/v2>
 - **内容**: ダッシュボードとレポートのカスタマイズ
 - **特徴**: データ可視化、インタラクティブなグラフ作成など
 
@@ -1100,8 +1218,6 @@ kv.events.on('view.data.updated', function(event) {
 - **kViewer**: データダッシュボードの作成
 - **その他のWebアプリケーション**: イベントリスナーは標準的な技術
 
-つまり、今日の2時間で、Web開発全般に応用できる基礎スキルを身につけたということです！
-
 ---
 
 **研修お疲れ様でした！**
@@ -1123,8 +1239,7 @@ kv.events.on('view.data.updated', function(event) {
 3. **今月中に**: 公式ドキュメントを読んで機能を1つ追加
 4. **興味があれば**: FormBridgeやkViewerにもチャレンジ
 
-実際のカスタマイズに挑戦する際は、今日学んだデバッグ方法を活用し、少しずつ機能を追加していくことが成功の鍵です！ラー情報の確認
-console.error('エラーメッセージ');
+実際のカスタマイズに挑戦する際は、今日学んだデバッグ方法を活用し、少しずつ機能を追加していくことが成功の鍵です！
 
 ```
 
@@ -1248,6 +1363,42 @@ let value2 = record['productName'].value;
 - [ ] CSVインポート・エクスポート
 - [ ] グラフの生成
 
+### 実際のkintoneアプリでの実習
+
+このフォルダに含まれている `js-kintone-training.zip` は、実際のkintoneアプリのテンプレートです。以下の手順で実習環境を構築できます。
+
+#### アプリテンプレートの利用手順
+
+1. **kintoneにログイン**
+   - 所属組織のkintone環境にアクセス
+
+2. **アプリテンプレートの読み込み**
+   - 「アプリ」画面で「アプリを作成」をクリック
+   - 「ファイルから作成」を選択
+   - `js-kintone-training.zip` をアップロード
+
+3. **作成されるアプリの構成**
+   - **単価** フィールド（数値）
+   - **数量** フィールド（数値）
+   - **合計** フィールド（数値、計算結果表示用）
+
+4. **カスタマイズの実装**
+   - アプリの「設定」→「JavaScript / CSS でカスタマイズ」
+   - 研修で作成したJavaScriptファイルをアップロード
+   - 「アプリを更新」をクリック
+
+5. **動作確認**
+   - レコード追加画面で単価・数量を入力
+   - 合計が自動計算されることを確認
+   - ブレークポイントデバッグも実習可能
+
+#### 実習のメリット
+
+- **実際の環境**: 本物のkintoneアプリでの動作確認
+- **即戦力**: そのまま業務で活用可能
+- **デバッグ練習**: Chrome DevToolsでの実践的デバッグ
+- **カスタマイズ拡張**: 研修後に機能追加の練習が可能
+
 ### 自習用リソース
 
 #### 公式ドキュメント
@@ -1255,41 +1406,6 @@ let value2 = record['productName'].value;
 - [Kintone 開発者サイト](https://developer.cybozu.io/hc/ja)
 - [JavaScript API リファレンス](https://developer.cybozu.io/hc/ja/articles/202166330)
 
-#### サンプルコード集
-
-```javascript
-// ユーザー情報の取得
-let user = kintone.getLoginUser();
-console.log(user.name); // ログインユーザー名
-
-// 現在日時の設定
-let today = new Date();
-let dateString = today.getFullYear() + '-' + 
-                (today.getMonth() + 1) + '-' + 
-                today.getDate();
-record['日付フィールド'].value = dateString;
-
-// 条件による表示制御
-if (record['ステータス'].value === '完了') {
-    kintone.app.record.setFieldShown('備考', false);
-}
-```
-
-### 練習問題
-
-#### 問題1: 基本計算
-
-消費税込み価格を自動計算するカスタマイズを作成してください。
-
-- 本体価格 × 1.1 = 税込価格
-
-#### 問題2: 日付チェック
-
-開始日が終了日より後の場合、エラーメッセージを表示してください。
-
-#### 問題3: 条件表示
-
-「重要度」が「高」の場合のみ「特記事項」フィールドを表示してください。
 
 ### 質疑応答
 
@@ -1299,798 +1415,9 @@ if (record['ステータス'].value === '完了') {
 A: 基本的なカスタマイズなら1-2週間、応用レベルなら1-2ヶ月程度が目安です。毎日少しずつでも継続することが重要です。
 
 **Q: エラーが出たときはどうすればいいですか？**
-A: まずはブラウザの開発者ツールでエラー内容を確認し、Google で検索してみてください。それでも解決しない場合は、社内の詳しい人に相談しましょう。
+A: まずはブラウザの開発者ツールでエラー内容を確認し、Google で検索してみてください。生成AIに聞いてもいいでしょう。それでも解決しない場合は、社内の詳しい人に相談しましょう。
 
 **Q: より複雑なカスタマイズをするにはどうすればいいですか？**
 A: まずは公式ドキュメントを読み、サンプルコードを参考にしながら少しずつ機能を追加していきましょう。無理に一度に多くの機能を実装しようとせず、段階的に進めることが大切です。
 
----
 
-## 付録: 練習用HTMLファイル一覧
-
-### 基本ファイル
-
-**demo_all_in_one.html** - 全機能を一つのファイルで確認
-
-```html
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <title>JavaScript基礎 - 総合デモ</title>
-    <style>
-        body { font-family: 'Arial', sans-serif; margin: 20px; }
-        .section { border: 1px solid #ccc; margin: 10px 0; padding: 15px; }
-        .section h3 { margin-top: 0; color: #333; }
-        input, button { margin: 5px; padding: 8px; }
-        button { background-color: #007cba; color: white; border: none; cursor: pointer; }
-        button:hover { background-color: #005a87; }
-    </style>
-</head>
-<body>
-    <h1>JavaScript基礎 - 総合デモ</h1>
-    <p><strong>F12を押してConsoleタブを確認してください</strong></p>
-    
-    <div class="section">
-        <h3>1. 変数テスト</h3>
-        <button onclick="testVariables()">変数をテスト</button>
-    </div>
-    
-    <div class="section">
-        <h3>2. 関数テスト</h3>
-        <input type="number" id="price" placeholder="単価" value="100">
-        <input type="number" id="quantity" placeholder="数量" value="5">
-        <button onclick="testFunctions()">計算実行</button>
-        <p id="result"></p>
-    </div>
-    
-    <div class="section">
-        <h3>3. オブジェクトテスト</h3>
-        <button onclick="testObjects()">オブジェクトをテスト</button>
-    </div>
-    
-    <div class="section">
-        <h3>4. 配列テスト</h3>
-        <button onclick="testArrays()">配列をテスト</button>
-    </div>
-    
-    <div class="section">
-        <h3>5. 条件分岐テスト</h3>
-        <input type="number" id="scoreInput" placeholder="点数を入力" value="85">
-        <button onclick="testConditions()">評価を確認</button>
-        <p id="evaluation"></p>
-    </div>
-    
-    <div class="section">
-        <h3>6. Kintoneっぽいデータ操作</h3>
-        <button onclick="testKintoneStyle()">レコード操作をテスト</button>
-    </div>
-    
-    <script>
-        console.log('総合デモページが読み込まれました');
-        
-        // 1. 変数テスト
-        function testVariables() {
-            console.log('=== 変数テスト開始 ===');
-            
-            let name = '田中太郎';
-            const companyName = 'サイボウズ';
-            let age = 30;
-            let isActive = true;
-            
-            console.log('名前:', name);
-            console.log('会社名:', companyName);
-            console.log('年齢:', age);
-            console.log('アクティブ:', isActive);
-            
-            // 変数の変更
-            name = '佐藤花子';
-            age = 25;
-            console.log('変更後 - 名前:', name, '年齢:', age);
-            
-            alert('変数テスト完了！Consoleを確認してください');
-        }
-        
-        // 2. 関数テスト
-        function testFunctions() {
-            console.log('=== 関数テスト開始 ===');
-            
-            let price = parseInt(document.getElementById('price').value);
-            let quantity = parseInt(document.getElementById('quantity').value);
-            
-            console.log('入力値 - 単価:', price, '数量:', quantity);
-            
-            // 通常の関数
-            function calculateTotal(p, q) {
-                console.log('calculateTotal関数実行中...');
-                return p * q;
-            }
-            
-            // アロー関数
-            const calculateTax = (amount) => {
-                console.log('消費税計算中...');
-                return Math.floor(amount * 1.1);
-            };
-            
-            let total = calculateTotal(price, quantity);
-            let totalWithTax = calculateTax(total);
-            
-            console.log('小計:', total);
-            console.log('税込合計:', totalWithTax);
-            
-            document.getElementById('result').innerHTML = 
-                `小計: ${total}円<br>税込合計: ${totalWithTax}円`;
-        }
-        
-        // 3. オブジェクトテスト
-        function testObjects() {
-            console.log('=== オブジェクトテスト開始 ===');
-            
-            // 基本的なオブジェクト
-            let user = {
-                name: '田中太郎',
-                department: '営業部',
-                email: 'tanaka@cybozu.co.jp',
-                skills: ['JavaScript', 'Kintone', 'Excel']
-            };
-            
-            console.log('ユーザー情報:', user);
-            console.log('名前:', user.name);
-            console.log('部署:', user['department']);
-            console.log('スキル一覧:', user.skills);
-            
-            // Kintone風のレコードオブジェクト
-            let record = {
-                "顧客名": { "value": "ABC商事" },
-                "担当者": { "value": "田中太郎" },
-                "売上": { "value": "1000000" },
-                "契約日": { "value": "2024-01-15" }
-            };
-            
-            console.log('レコード:', record);
-            console.log('顧客名:', record["顧客名"].value);
-            console.log('売上:', record["売上"].value);
-            
-            alert('オブジェクトテスト完了！');
-        }
-        
-        // 4. 配列テスト
-        function testArrays() {
-            console.log('=== 配列テスト開始 ===');
-            
-            let products = ['ノートPC', 'マウス', 'キーボード', 'モニター'];
-            console.log('商品リスト:', products);
-            console.log('商品数:', products.length);
-            
-            // 全要素を表示
-            console.log('--- 全商品 ---');
-            for (let i = 0; i < products.length; i++) {
-                console.log(`${i + 1}. ${products[i]}`);
-            }
-            
-            // 新商品追加
-            products.push('プリンター');
-            console.log('追加後:', products);
-            
-            // 売上データの配列
-            let salesData = [
-                { month: '1月', amount: 1000000 },
-                { month: '2月', amount: 1200000 },
-                { month: '3月', amount: 980000 }
-            ];
-            
-            console.log('--- 売上データ ---');
-            let totalSales = 0;
-            for (let i = 0; i < salesData.length; i++) {
-                console.log(`${salesData[i].month}: ${salesData[i].amount}円`);
-                totalSales += salesData[i].amount;
-            }
-            console.log('合計売上:', totalSales);
-            
-            alert('配列テスト完了！');
-        }
-        
-        // 5. 条件分岐テスト
-        function testConditions() {
-            console.log('=== 条件分岐テスト開始 ===');
-            
-            let score = parseInt(document.getElementById('scoreInput').value);
-            console.log('入力された点数:', score);
-            
-            let evaluation = '';
-            let message = '';
-            
-            if (score >= 90) {
-                evaluation = 'S';
-                message = '優秀です！';
-                console.log('評価: S (90点以上)');
-            } else if (score >= 80) {
-                evaluation = 'A';
-                message = '良好です';
-                console.log('評価: A (80-89点)');
-            } else if (score >= 70) {
-                evaluation = 'B';
-                message = '合格です';
-                console.log('評価: B (70-79点)');
-            } else if (score >= 60) {
-                evaluation = 'C';
-                message = '要努力';
-                console.log('評価: C (60-69点)');
-            } else {
-                evaluation = 'D';
-                message = '再試験';
-                console.log('評価: D (60点未満)');
-            }
-            
-            // 追加チェック
-            if (score < 0 || score > 100) {
-                message = '点数が範囲外です（0-100で入力）';
-                console.log('エラー: 点数範囲外');
-            }
-            
-            document.getElementById('evaluation').innerHTML = 
-                `評価: ${evaluation}<br>${message}`;
-        }
-        
-        // 6. Kintoneスタイルのデータ操作
-        function testKintoneStyle() {
-            console.log('=== Kintoneスタイルテスト開始 ===');
-            
-            // レコードの例（Kintoneから取得した想定）
-            let record = {
-                "商品名": { "value": "ノートパソコン" },
-                "単価": { "value": "80000" },
-                "数量": { "value": "3" },
-                "割引率": { "value": "10" },
-                "合計": { "value": "" }  // これを計算で設定
-            };
-            
-            console.log('処理前のレコード:', record);
-            
-            // 値の取得と計算
-            let productName = record["商品名"].value;
-            let unitPrice = parseInt(record["単価"].value) || 0;
-            let quantity = parseInt(record["数量"].value) || 0;
-            let discountRate = parseInt(record["割引率"].value) || 0;
-            
-            console.log('商品名:', productName);
-            console.log('単価:', unitPrice);
-            console.log('数量:', quantity);
-            console.log('割引率:', discountRate + '%');
-            
-            // 計算処理
-            let subtotal = unitPrice * quantity;
-            let discount = Math.floor(subtotal * discountRate / 100);
-            let total = subtotal - discount;
-            
-            console.log('小計:', subtotal);
-            console.log('割引額:', discount);
-            console.log('合計:', total);
-            
-            // レコードに結果を設定
-            record["合計"].value = total.toString();
-            
-            console.log('処理後のレコード:', record);
-            
-            // バリデーション例
-            if (total > 500000) {
-                console.log('警告: 合計金額が50万円を超えています');
-            }
-            
-            if (quantity <= 0) {
-                console.log('エラー: 数量は1以上で入力してください');
-            }
-            
-            alert('Kintoneスタイルテスト完了！詳細はConsoleを確認してください');
-        }
-        
-        // ページ読み込み時の初期化
-        console.log('すべての関数が準備完了しました！');
-        console.log('各ボタンをクリックして動作を確認してください');
-    </script>
-</body>
-</html>
-```
-
-### Kintone実践用デモファイル
-
-**kintone_practice.html** - Kintoneのイベント処理を疑似体験
-
-```html
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <title>Kintone実践練習</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f5f5f5; }
-        .kintone-form { background: white; padding: 20px; border-radius: 5px; max-width: 600px; }
-        .field-group { margin: 15px 0; }
-        label { display: inline-block; width: 100px; font-weight: bold; }
-        input, select { padding: 8px; margin: 5px; border: 1px solid #ccc; }
-        .readonly { background-color: #f0f0f0; }
-        .error { border-color: red; }
-        .error-message { color: red; font-size: 12px; }
-        .success { border-color: green; }
-        button { background: #007cba; color: white; padding: 10px 20px; border: none; cursor: pointer; margin: 5px; }
-        button:hover { background: #005a87; }
-        .event-log { background: #f9f9f9; padding: 10px; border-left: 4px solid #007cba; margin: 10px 0; }
-    </style>
-</head>
-<body>
-    <h1>Kintone実践練習 - 疑似レコード画面</h1>
-    <p><strong>F12でConsoleを開いて、Kintoneイベントの動作を確認しましょう</strong></p>
-    
-    <div class="kintone-form">
-        <h2>商品管理レコード</h2>
-        
-        <div class="field-group">
-            <label>商品名:</label>
-            <input type="text" id="product_name" value="ノートパソコン">
-        </div>
-        
-        <div class="field-group">
-            <label>単価:</label>
-            <input type="number" id="unit_price" value="50000">
-        </div>
-        
-        <div class="field-group">
-            <label>数量:</label>
-            <input type="number" id="quantity" value="2">
-        </div>
-        
-        <div class="field-group">
-            <label>割引率(%):</label>
-            <input type="number" id="discount_rate" value="10" max="50">
-        </div>
-        
-        <div class="field-group">
-            <label>小計:</label>
-            <input type="number" id="subtotal" class="readonly" readonly>
-        </div>
-        
-        <div class="field-group">
-            <label>割引額:</label>
-            <input type="number" id="discount_amount" class="readonly" readonly>
-        </div>
-        
-        <div class="field-group">
-            <label>合計:</label>
-            <input type="number" id="total" class="readonly" readonly>
-        </div>
-        
-        <div class="field-group">
-            <label>ステータス:</label>
-            <select id="status">
-                <option value="未処理">未処理</option>
-                <option value="確認中">確認中</option>
-                <option value="承認済み">承認済み</option>
-            </select>
-        </div>
-        
-        <div class="field-group">
-            <label>特記事項:</label>
-            <input type="text" id="notes" placeholder="承認済みの場合のみ表示">
-        </div>
-        
-        <div id="error-messages"></div>
-        
-        <button onclick="simulateShow()">画面表示イベント実行</button>
-        <button onclick="simulateSubmit()">保存前イベント実行</button>
-        <button onclick="clearLog()">ログクリア</button>
-    </div>
-    
-    <div class="event-log">
-        <h3>イベントログ</h3>
-        <div id="event-log-content">ここにイベントの実行結果が表示されます</div>
-    </div>
-    
-    <script>
-        // 疑似的なKintoneレコード構造
-        let mockRecord = {};
-        
-        // ログ出力関数
-        function logEvent(message, type = 'info') {
-            console.log(message);
-            let logElement = document.getElementById('event-log-content');
-            let timestamp = new Date().toLocaleTimeString();
-            let color = type === 'error' ? 'red' : type === 'warning' ? 'orange' : 'black';
-            logElement.innerHTML += `<div style="color: ${color}; margin: 2px 0;">
-                [${timestamp}] ${message}</div>`;
-        }
-        
-        // DOM要素をmockRecordに同期
-        function syncToMockRecord() {
-            mockRecord = {
-                "商品名": { "value": document.getElementById('product_name').value },
-                "単価": { "value": document.getElementById('unit_price').value },
-                "数量": { "value": document.getElementById('quantity').value },
-                "割引率": { "value": document.getElementById('discount_rate').value },
-                "小計": { "value": document.getElementById('subtotal').value },
-                "割引額": { "value": document.getElementById('discount_amount').value },
-                "合計": { "value": document.getElementById('total').value },
-                "ステータス": { "value": document.getElementById('status').value },
-                "特記事項": { "value": document.getElementById('notes').value }
-            };
-        }
-        
-        // mockRecordをDOM要素に同期
-        function syncFromMockRecord() {
-            document.getElementById('product_name').value = mockRecord["商品名"].value;
-            document.getElementById('unit_price').value = mockRecord["単価"].value;
-            document.getElementById('quantity').value = mockRecord["数量"].value;
-            document.getElementById('discount_rate').value = mockRecord["割引率"].value;
-            document.getElementById('subtotal').value = mockRecord["小計"].value;
-            document.getElementById('discount_amount').value = mockRecord["割引額"].value;
-            document.getElementById('total').value = mockRecord["合計"].value;
-            document.getElementById('status').value = mockRecord["ステータス"].value;
-            document.getElementById('notes').value = mockRecord["特記事項"].value;
-        }
-        
-        // Kintone風のイベント処理群
-        
-        // 1. 画面表示時の処理（app.record.detail.show相当）
-        function onRecordShow() {
-            logEvent('=== app.record.detail.show イベント実行 ===');
-            logEvent('レコード詳細画面が表示されました');
-            
-            let record = mockRecord;
-            
-            // 初期計算実行
-            calculateTotal();
-            
-            // ステータスによる制御
-            controlFieldsByStatus();
-            
-            logEvent('画面表示時の処理完了');
-            return true;
-        }
-        
-        // 2. フィールド変更時の処理（app.record.edit.change相当）
-        function onQuantityChange() {
-            logEvent('=== app.record.edit.change.数量 イベント実行 ===');
-            syncToMockRecord();
-            
-            let record = mockRecord;
-            let quantity = parseInt(record["数量"].value) || 0;
-            
-            logEvent(`数量が変更されました: ${quantity}`);
-            
-            // バリデーション
-            if (quantity < 0) {
-                logEvent('エラー: 数量に負の数は入力できません', 'error');
-                document.getElementById('quantity').classList.add('error');
-                record["数量"].value = "0";
-                quantity = 0;
-            } else {
-                document.getElementById('quantity').classList.remove('error');
-            }
-            
-            // 自動計算
-            calculateTotal();
-            
-            // 警告チェック
-            let total = parseInt(record["合計"].value) || 0;
-            if (total > 100000) {
-                logEvent('警告: 合計金額が10万円を超えています', 'warning');
-            }
-            
-            syncFromMockRecord();
-            return true;
-        }
-        
-        // 3. ステータス変更時の処理
-        function onStatusChange() {
-            logEvent('=== app.record.edit.change.ステータス イベント実行 ===');
-            syncToMockRecord();
-            
-            let record = mockRecord;
-            let status = record["ステータス"].value;
-            
-            logEvent(`ステータスが変更されました: ${status}`);
-            
-            controlFieldsByStatus();
-            
-            syncFromMockRecord();
-            return true;
-        }
-        
-        // 4. 保存前処理（app.record.create.submit相当）
-        function onRecordSubmit() {
-            logEvent('=== app.record.create.submit イベント実行 ===');
-            syncToMockRecord();
-            
-            let record = mockRecord;
-            let errors = [];
-            
-            // 必須チェック
-            if (!record["商品名"].value.trim()) {
-                errors.push('商品名は必須です');
-            }
-            
-            let quantity = parseInt(record["数量"].value) || 0;
-            if (quantity <= 0) {
-                errors.push('数量は1以上で入力してください');
-            }
-            
-            let unitPrice = parseInt(record["単価"].value) || 0;
-            if (unitPrice <= 0) {
-                errors.push('単価は1以上で入力してください');
-            }
-            
-            // 承認済みの場合の特記事項チェック
-            if (record["ステータス"].value === '承認済み' && !record["特記事項"].value.trim()) {
-                errors.push('承認済みの場合は特記事項が必須です');
-            }
-            
-            // エラー表示
-            let errorElement = document.getElementById('error-messages');
-            if (errors.length > 0) {
-                logEvent(`保存前エラー: ${errors.join(', ')}`, 'error');
-                errorElement.innerHTML = errors.map(err => 
-                    `<div class="error-message">● ${err}</div>`).join('');
-                return false;
-            } else {
-                errorElement.innerHTML = '';
-                logEvent('バリデーション通過 - 保存可能です');
-                return true;
-            }
-        }
-        
-        // 補助関数群
-        
-        function calculateTotal() {
-            let record = mockRecord;
-            
-            let unitPrice = parseInt(record["単価"].value) || 0;
-            let quantity = parseInt(record["数量"].value) || 0;
-            let discountRate = parseInt(record["割引率"].value) || 0;
-            
-            let subtotal = unitPrice * quantity;
-            let discountAmount = Math.floor(subtotal * discountRate / 100);
-            let total = subtotal - discountAmount;
-            
-            record["小計"].value = subtotal.toString();
-            record["割引額"].value = discountAmount.toString();
-            record["合計"].value = total.toString();
-            
-            logEvent(`計算実行: ${unitPrice} × ${quantity} - ${discountAmount} = ${total}`);
-        }
-        
-        function controlFieldsByStatus() {
-            let record = mockRecord;
-            let status = record["ステータス"].value;
-            let notesField = document.getElementById('notes');
-            
-            if (status === '承認済み') {
-                notesField.style.display = 'inline-block';
-                notesField.placeholder = '承認済みのため入力必須';
-                logEvent('特記事項フィールドを表示');
-            } else {
-                notesField.style.display = 'none';
-                logEvent('特記事項フィールドを非表示');
-            }
-        }
-        
-        // 疑似イベント実行関数
-        function simulateShow() {
-            syncToMockRecord();
-            onRecordShow();
-        }
-        
-        function simulateSubmit() {
-            syncToMockRecord();
-            if (onRecordSubmit()) {
-                alert('保存処理が実行されました！');
-            } else {
-                alert('エラーがあります。修正してください。');
-            }
-        }
-        
-        function clearLog() {
-            document.getElementById('event-log-content').innerHTML = 'ログをクリアしました';
-        }
-        
-        // リアルタイムイベントリスナー
-        document.getElementById('quantity').addEventListener('input', onQuantityChange);
-        document.getElementById('unit_price').addEventListener('input', () => {
-            syncToMockRecord();
-            calculateTotal();
-            syncFromMockRecord();
-        });
-        document.getElementById('discount_rate').addEventListener('input', () => {
-            syncToMockRecord();
-            calculateTotal();
-            syncFromMockRecord();
-        });
-        document.getElementById('status').addEventListener('change', onStatusChange);
-        
-        // 初期化
-        syncToMockRecord();
-        logEvent('Kintone実践練習ページが初期化されました');
-        logEvent('フィールドを変更してイベントの動作を確認してください');
-    </script>
-</body>
-</html>
-```
-
-### デバッグ練習用ファイル
-
-**debug_practice.html** - よくあるエラーを体験して修正練習
-
-```html
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <title>デバッグ練習</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .error-example { border: 1px solid #ff6b6b; padding: 15px; margin: 10px 0; background: #ffe0e0; }
-        .fixed-example { border: 1px solid #51cf66; padding: 15px; margin: 10px 0; background: #e0ffe0; }
-        button { padding: 10px; margin: 5px; cursor: pointer; }
-        .error { background: #ff6b6b; color: white; }
-        .success { background: #51cf66; color: white; }
-        pre { background: #f8f9fa; padding: 10px; overflow-x: auto; }
-    </style>
-</head>
-<body>
-    <h1>JavaScript デバッグ練習</h1>
-    <p><strong>各エラー例を実行して、Consoleでエラーを確認し、修正版と比較してください</strong></p>
-    
-    <div class="error-example">
-        <h3>エラー例1: 変数名の間違い</h3>
-        <button class="error" onclick="errorExample1()">エラーを実行</button>
-        <button class="success" onclick="fixedExample1()">修正版を実行</button>
-        <pre>
-エラーコード:
-let userName = '田中';
-console.log(userNmae);  // 変数名が間違っている
-
-修正版:
-let userName = '田中';
-console.log(userName);  // 正しい変数名
-        </pre>
-    </div>
-    
-    <div class="error-example">
-        <h3>エラー例2: 括弧の閉じ忘れ</h3>
-        <button class="error" onclick="errorExample2()">エラーを実行</button>
-        <button class="success" onclick="fixedExample2()">修正版を実行</button>
-        <pre>
-エラーコード:
-function calculate(a, b {  // 括弧が足りない
-    return a + b;
-}
-
-修正版:
-function calculate(a, b) {  // 括弧を追加
-    return a + b;
-}
-        </pre>
-    </div>
-    
-    <div class="error-example">
-        <h3>エラー例3: 存在しないプロパティへのアクセス</h3>
-        <button class="error" onclick="errorExample3()">エラーを実行</button>
-        <button class="success" onclick="fixedExample3()">修正版を実行</button>
-        <pre>
-エラーコード:
-let user = { name: '田中', age: 30 };
-console.log(user.email.toLowerCase());  // emailプロパティが存在しない
-
-修正版:
-let user = { name: '田中', age: 30 };
-if (user.email) {
-    console.log(user.email.toLowerCase());
-} else {
-    console.log('emailが設定されていません');
-}
-        </pre>
-    </div>
-    
-    <script>
-        console.log('デバッグ練習ページが読み込まれました');
-        
-        // エラー例1: 変数名の間違い
-        function errorExample1() {
-            try {
-                let userName = '田中';
-                console.log(userNmae);  // 意図的なエラー
-            } catch (e) {
-                console.error('エラー例1:', e.message);
-                alert('Consoleでエラーを確認してください: ' + e.message);
-            }
-        }
-        
-        function fixedExample1() {
-            let userName = '田中';
-            console.log('修正版1 - ユーザー名:', userName);
-            alert('修正版1が正常に実行されました');
-        }
-        
-        // エラー例2: 括弧の閉じ忘れ（実際には構文エラーなので別の方法で説明）
-        function errorExample2() {
-            console.log('エラー例2: このようなコードは構文エラーで実行できません');
-            console.log('function calculate(a, b { return a + b; }');
-            alert('構文エラーの例です。実際にはページが読み込めません');
-        }
-        
-        function fixedExample2() {
-            function calculate(a, b) {  // 正しい構文
-                return a + b;
-            }
-            let result = calculate(10, 20);
-            console.log('修正版2 - 計算結果:', result);
-            alert('修正版2が正常に実行されました: ' + result);
-        }
-        
-        // エラー例3: 存在しないプロパティ
-        function errorExample3() {
-            try {
-                let user = { name: '田中', age: 30 };
-                console.log('user オブジェクト:', user);
-                console.log(user.email.toLowerCase());  // 意図的なエラー
-            } catch (e) {
-                console.error('エラー例3:', e.message);
-                alert('Consoleでエラーを確認してください: ' + e.message);
-            }
-        }
-        
-        function fixedExample3() {
-            let user = { name: '田中', age: 30 };
-            console.log('修正版3 - user オブジェクト:', user);
-            
-            if (user.email) {
-                console.log('Email:', user.email.toLowerCase());
-            } else {
-                console.log('emailプロパティが設定されていません');
-            }
-            alert('修正版3が正常に実行されました');
-        }
-    </script>
-</body>
-</html>
-```
-
----
-
-## 付録: チートシート
-
-### HTMLファイルの使い方
-
-1. 各コードをテキストエディタにコピー
-2. 拡張子を `.html` で保存
-3. ブラウザで開く
-4. **F12** を押してConsoleタブを確認
-
-### よく使うKintoneイベント
-
-```javascript
-// レコード表示系
-'app.record.detail.show'     // 詳細画面表示
-'app.record.create.show'     // 新規作成画面表示
-'app.record.edit.show'       // 編集画面表示
-
-// レコード保存系
-'app.record.create.submit'   // 新規保存
-'app.record.edit.submit'     // 更新保存
-
-// フィールド変更系
-'app.record.edit.change.フィールドコード'  // 特定フィールド変更
-```
-
-### よく使うフィールド操作
-
-```javascript
-// 値の取得
-let value = record['フィールドコード'].value;
-
-// 値の設定
-record['フィールドコード'].value = '新しい値';
-
-// フィールドの表示/非表示
-kintone.app.record.setFieldShown('フィールドコード', true);  // 表示
-kintone.app.record.setFieldShown('フィールドコード', false); // 非表示
-
-// エ
